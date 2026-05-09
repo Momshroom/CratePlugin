@@ -266,13 +266,19 @@ public class CorePlugin extends JavaPlugin implements CratePlugin {
         WorldLoadListener.clear();
         
         // Dispose effect services
-        getJavaPluginComponent().getEffectServiceComponent().dispose();
+        if (javaPluginComponent != null) {
+            javaPluginComponent.getEffectServiceComponent().dispose();
+        }
         
         // Remove all holograms
-        hologramProvider.removeAll();
+        if (hologramProvider != null) {
+            hologramProvider.removeAll();
+        }
         
         // Unregister commands
-        commandHandler.unregisterCommands();
+        if (commandHandler != null) {
+            commandHandler.unregisterCommands();
+        }
         
         // Close and remove logger handlers
         for (Handler handler : this.getLogger().getHandlers()) {

@@ -1,9 +1,10 @@
 package com.hazebyte.crate.cratereloaded.util;
 
-import com.hazebyte.crate.cratereloaded.CorePlugin;
 import java.util.HashMap;
+import java.util.Locale;
 import java.util.Map;
 import java.util.StringJoiner;
+import org.bukkit.NamespacedKey;
 import org.bukkit.enchantments.Enchantment;
 
 public class Enchantments {
@@ -11,62 +12,60 @@ public class Enchantments {
     private static final StringJoiner enchantSB = new StringJoiner(", ");
 
     static {
-        for (Enchantment e : Enchantment.values()) enchantSB.add(e.getName());
+        for (Enchantment e : Enchantment.values()) enchantSB.add(e.getKey().getKey());
 
-        put("environmental_protection", Enchantment.PROTECTION_ENVIRONMENTAL);
-        put("protection", Enchantment.PROTECTION_ENVIRONMENTAL);
-        put("fire_protection", Enchantment.PROTECTION_FIRE);
-        put("fall_protection", Enchantment.PROTECTION_FALL);
-        put("explosion_protection", Enchantment.PROTECTION_EXPLOSIONS);
-        put("projectile_protection", Enchantment.PROTECTION_PROJECTILE);
-        put("oxygen", Enchantment.OXYGEN);
-        put("water_worker", Enchantment.WATER_WORKER);
-        put("thorns", Enchantment.THORNS);
-        put("depth_strider", Enchantment.DEPTH_STRIDER);
-        put("frost_walker", "FROST_WALKER");
-        put("binding_curse", "BINDING_CURSE");
-        put("sharpness", Enchantment.DAMAGE_ALL);
-        put("smite", Enchantment.DAMAGE_UNDEAD);
-        put("bane_of_arthropods", Enchantment.DAMAGE_ARTHROPODS);
-        put("fire_aspect", Enchantment.FIRE_ASPECT);
-        put("looting", Enchantment.LOOT_BONUS_MOBS);
-        put("sweeping_edge", "SWEEPING_EDGE");
-        put("efficiency", Enchantment.DIG_SPEED);
-        put("silk_touch", Enchantment.SILK_TOUCH);
-        put("unbreaking", Enchantment.DURABILITY);
-        put("fortune", Enchantment.LOOT_BONUS_BLOCKS);
-        put("power", Enchantment.ARROW_DAMAGE);
-        put("punch", Enchantment.ARROW_KNOCKBACK);
-        put("flame", Enchantment.ARROW_FIRE);
-        put("infinity", Enchantment.ARROW_INFINITE);
-        put("luck", Enchantment.LUCK);
-        put("lure", Enchantment.LURE);
-        put("mending", "MENDING");
-        put("vanishing_curse", "VANISHING_CURSE");
+        put("environmental_protection", "protection");
+        put("protection", "protection");
+        put("fire_protection", "fire_protection");
+        put("fall_protection", "feather_falling");
+        put("explosion_protection", "blast_protection");
+        put("projectile_protection", "projectile_protection");
+        put("oxygen", "respiration");
+        put("water_worker", "aqua_affinity");
+        put("thorns", "thorns");
+        put("depth_strider", "depth_strider");
+        put("frost_walker", "frost_walker");
+        put("binding_curse", "binding_curse");
+        put("sharpness", "sharpness");
+        put("smite", "smite");
+        put("bane_of_arthropods", "bane_of_arthropods");
+        put("fire_aspect", "fire_aspect");
+        put("looting", "looting");
+        put("sweeping_edge", "sweeping_edge");
+        put("efficiency", "efficiency");
+        put("silk_touch", "silk_touch");
+        put("unbreaking", "unbreaking");
+        put("fortune", "fortune");
+        put("power", "power");
+        put("punch", "punch");
+        put("flame", "flame");
+        put("infinity", "infinity");
+        put("luck", "luck_of_the_sea");
+        put("lure", "lure");
+        put("mending", "mending");
+        put("vanishing_curse", "vanishing_curse");
 
-        put("channeling", "CHANNELING");
-        put("impaling", "IMPALING");
-        put("multishot", "MULTSHOT");
-        put("piercing", "PIERCING");
-        put("quick_charge", "QUICK_CHARGE");
+        put("channeling", "channeling");
+        put("impaling", "impaling");
+        put("multishot", "multishot");
+        put("piercing", "piercing");
+        put("quick_charge", "quick_charge");
     }
 
-    private static void put(String name, Enchantment enchant) {
-        ENCHANTS.put(name, enchant);
-    }
-
-    private static void put(String name, String enchant) {
-        Enchantment enchantment = Enchantment.getByName(enchant);
+    private static void put(String name, String key) {
+        Enchantment enchantment = Enchantment.getByKey(NamespacedKey.minecraft(key));
         if (enchantment != null) {
             ENCHANTS.put(name, enchantment);
-        } else {
-            CorePlugin.getPlugin().getLogger().finer(enchant + " was not found.");
         }
     }
 
     public static Enchantment getByName(String name) {
-        Enchantment enchantment = Enchantment.getByName(name.toUpperCase());
-        return enchantment == null ? ENCHANTS.get(name.toLowerCase()) : enchantment;
+        String normalized = name.toLowerCase(Locale.ROOT);
+        Enchantment enchantment = Enchantment.getByKey(NamespacedKey.minecraft(normalized));
+        if (enchantment == null) {
+            enchantment = Enchantment.getByName(name.toUpperCase(Locale.ROOT));
+        }
+        return enchantment == null ? ENCHANTS.get(normalized) : enchantment;
     }
 
     public static String getStringFormat() {

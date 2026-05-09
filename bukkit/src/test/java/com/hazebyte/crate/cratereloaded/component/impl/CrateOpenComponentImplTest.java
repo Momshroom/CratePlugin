@@ -5,6 +5,7 @@ import com.hazebyte.crate.api.crate.reward.Reward;
 import com.hazebyte.crate.api.result.RewardExecutorResult;
 import com.hazebyte.crate.api.util.ItemBuilder;
 import com.hazebyte.crate.cratereloaded.component.GivePlayerItemsComponent;
+import com.hazebyte.crate.cratereloaded.component.PluginSettingComponent;
 import com.hazebyte.crate.cratereloaded.model.RewardImpl;
 import java.util.Arrays;
 import java.util.EnumSet;
@@ -17,6 +18,7 @@ import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.Arguments;
 import org.junit.jupiter.params.provider.MethodSource;
+import org.mockito.Mockito;
 
 public class CrateOpenComponentImplTest extends BukkitTest {
 
@@ -24,7 +26,9 @@ public class CrateOpenComponentImplTest extends BukkitTest {
 
     @BeforeAll
     public static void setupRewardExecutor() {
-        GivePlayerItemsComponent givePlayerItemsComponent = new GivePlayerItemsComponentImpl(plugin);
+        PluginSettingComponent settings = Mockito.mock(PluginSettingComponent.class);
+        Mockito.when(settings.isHandlingClaims()).thenReturn(true);
+        GivePlayerItemsComponent givePlayerItemsComponent = new GivePlayerItemsComponentImpl(plugin, settings);
         rewardExecutor = new OpenCrateComponentImpl(plugin, givePlayerItemsComponent);
     }
 

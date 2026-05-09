@@ -1,8 +1,8 @@
 package com.hazebyte.crate.cratereloaded.util;
 
-import com.hazebyte.base.util.ItemBuilder;
 import com.hazebyte.crate.api.crate.Crate;
 import com.hazebyte.crate.api.effect.Category;
+import com.hazebyte.crate.api.util.ItemBuilder;
 import com.hazebyte.util.Mat;
 import java.util.regex.Pattern;
 import org.bukkit.inventory.ItemStack;

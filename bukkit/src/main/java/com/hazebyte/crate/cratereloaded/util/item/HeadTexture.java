@@ -3,18 +3,18 @@ package com.hazebyte.crate.cratereloaded.util.item;
 import com.hazebyte.crate.api.ServerVersion;
 import com.hazebyte.crate.api.util.Messenger;
 import com.hazebyte.crate.cratereloaded.CorePlugin;
+import com.google.common.collect.HashMultimap;
 import com.mojang.authlib.GameProfile;
 import com.mojang.authlib.properties.Property;
 import com.mojang.authlib.properties.PropertyMap;
-import lombok.NonNull;
-import org.bukkit.inventory.meta.SkullMeta;
-
 import java.lang.reflect.Constructor;
 import java.lang.reflect.Field;
 import java.lang.reflect.Method;
 import java.util.Collection;
 import java.util.UUID;
 import java.util.logging.Level;
+import lombok.NonNull;
+import org.bukkit.inventory.meta.SkullMeta;
 
 /** Created by wixu on 6/22/17. */
 public class HeadTexture {
@@ -32,9 +32,10 @@ public class HeadTexture {
     }
 
     public static SkullMeta applyToMeta(@NonNull SkullMeta meta, @NonNull String base64) {
-        GameProfile profile = new GameProfile(UUID.randomUUID(), "");
         Property property = new Property("textures", base64);
-        profile.getProperties().put("textures", property);
+        PropertyMap propertyMap = new PropertyMap(HashMultimap.create());
+        propertyMap.put("textures", property);
+        GameProfile profile = new GameProfile(UUID.randomUUID(), "", propertyMap);
 
         if (ServerVersion.getVersion().gte(ServerVersion.v1_18_R0)) {
             setProfileToMeta_gt_1_16(meta, profile);
@@ -96,18 +97,14 @@ public class HeadTexture {
                     return null;
                 }
                 GameProfile profile = (GameProfile) object;
-                PropertyMap map = profile.getProperties();
+                PropertyMap map = profile.properties();
                 Collection<Property> propertyCollection = map.get("textures");
                 Property property = propertyCollection.iterator().next();
                 if (property != null) {
-                    Field valueField = property.getClass().getDeclaredField("value");
-                    valueField.setAccessible(true);
-                    return (String) valueField.get(property);
+                    return property.value();
                 }
             } catch (IllegalAccessException e) {
                 CorePlugin.getPlugin().getLogger().log(Level.WARNING, "Failed to access profile field value", e);
-            } catch (NoSuchFieldException e) {
-                CorePlugin.getPlugin().getLogger().log(Level.WARNING, "Failed to access texture value field", e);
             }
         }
         return null;

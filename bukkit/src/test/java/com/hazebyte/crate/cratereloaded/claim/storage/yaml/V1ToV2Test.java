@@ -39,7 +39,7 @@ public class V1ToV2Test extends BukkitTest {
     }
 
     @Test
-    public void integrationTest() {
+    public void integrationTest() throws Exception {
         YamlClaimStorage storage = new YamlClaimStorage(plugin, claimExecutor);
         YamlClaimLineParser parser = new V1YamlClaimLineParser(claimExecutor);
         Config config = storage.getConfig(playerMock);

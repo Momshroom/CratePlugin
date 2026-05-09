@@ -2,6 +2,7 @@ package com.hazebyte.crate.api.util;
 
 import com.hazebyte.crate.api.ServerVersion;
 import org.bukkit.Material;
+import org.bukkit.NamespacedKey;
 import org.bukkit.enchantments.Enchantment;
 import org.bukkit.inventory.ItemFlag;
 import org.bukkit.inventory.ItemStack;
@@ -159,7 +160,20 @@ public class ItemBuilder {
   }
 
   public ItemBuilder flag(ItemFlag flag) {
-    this.flags(flag);
+    if (flag != null) {
+      this.flags(flag);
+    }
+    return this;
+  }
+
+  private ItemBuilder flag(String... names) {
+    for (String name : names) {
+      try {
+        return flag(ItemFlag.valueOf(name));
+      } catch (IllegalArgumentException ignored) {
+        // ItemFlag names changed in newer Bukkit/Paper APIs.
+      }
+    }
     return this;
   }
 
@@ -174,11 +188,11 @@ public class ItemBuilder {
   }
 
   public ItemBuilder hideAll(boolean hide) {
-    return flag(ItemFlag.HIDE_ENCHANTS)
-        .flag(ItemFlag.HIDE_ATTRIBUTES)
-        .flag(ItemFlag.HIDE_UNBREAKABLE)
-        .flag(ItemFlag.HIDE_POTION_EFFECTS)
-        .flag(ItemFlag.HIDE_DESTROYS);
+    return flag("HIDE_ENCHANTS")
+        .flag("HIDE_ATTRIBUTES")
+        .flag("HIDE_UNBREAKABLE")
+        .flag("HIDE_POTION_EFFECTS", "HIDE_ADDITIONAL_TOOLTIP")
+        .flag("HIDE_DESTROYS");
   }
 
   public Integer getCustomModelData() {
@@ -236,7 +250,12 @@ public class ItemBuilder {
 
   public ItemBuilder setGlowing(boolean glowing) {
     if (glowing) {
-      unsafeEnchant(itemStack.getType() != Material.BOW ? Enchantment.ARROW_INFINITE : Enchantment.LUCK, 10);
+      Enchantment enchantment = itemStack.getType() != Material.BOW
+          ? Enchantment.getByKey(NamespacedKey.minecraft("infinity"))
+          : Enchantment.getByKey(NamespacedKey.minecraft("luck_of_the_sea"));
+      if (enchantment != null) {
+        unsafeEnchant(enchantment, 10);
+      }
       flag(ItemFlag.HIDE_ENCHANTS);
     }
     return this;
