@@ -1,0 +1,204 @@
+plugins {
+    id 'base'
+    id 'com.gradleup.shadow' version '9.4.1' apply false
+}
+
+ext {
+    javaLanguageVersion = 25
+    paperApiVersion = '26.1.2.build.60-stable'
+    decentHologramsVersion = '2.9.9'
+    lombokVersion = '1.18.46'
+    mapstructVersion = '1.6.3'
+    daggerVersion = '2.59.2'
+}
+
+def localPluginJars = { String pattern ->
+    files(
+            fileTree(dir: rootProject.file('libs'), include: pattern),
+            fileTree(dir: rootProject.file('servers'), include: "**/plugins/${pattern}")
+    )
+}
+
+def includeLocalPluginJars = providers.gradleProperty('includeLocalPluginJars')
+        .map { it.toBoolean() }
+        .orElse(true)
+
+allprojects {
+    group = project.path == ':api' || project.path == ':utils' ? 'com.hazebyte' : 'com.hazebyte.crate'
+    version = project.path == ':api' ? '2.2.1' : project.path == ':utils' ? '1.0.0' : '2.3.16'
+
+    repositories {
+        mavenCentral()
+        maven {
+            name = 'PaperMC'
+            url = uri('https://repo.papermc.io/repository/maven-public/')
+        }
+        maven {
+            name = 'Aikar'
+            url = uri('https://repo.aikar.co/content/groups/aikar/')
+        }
+        maven {
+            name = 'ExtendedClip'
+            url = uri('https://repo.extendedclip.com/content/repositories/placeholderapi/')
+        }
+        maven {
+            name = 'CodeMC'
+            url = uri('https://repo.codemc.io/repository/maven-public/')
+        }
+        maven {
+            name = 'ElMakers'
+            url = uri('https://maven.elmakers.com/repository')
+        }
+        maven {
+            name = 'Hazebyte'
+            url = uri('https://m2.hazebyte.com/repository/maven_releases/')
+        }
+        maven {
+            name = 'JitPack'
+            url = uri('https://jitpack.io')
+        }
+        maven {
+            name = 'MinecraftLibraries'
+            url = uri('https://libraries.minecraft.net/')
+        }
+    }
+}
+
+subprojects {
+    apply plugin: 'java-library'
+
+    java {
+        toolchain {
+            languageVersion = JavaLanguageVersion.of(rootProject.ext.javaLanguageVersion)
+        }
+    }
+
+    tasks.withType(JavaCompile).configureEach {
+        options.encoding = 'UTF-8'
+        options.release = rootProject.ext.javaLanguageVersion
+        options.compilerArgs.addAll(['-parameters'])
+    }
+
+    tasks.withType(Test).configureEach {
+        useJUnitPlatform()
+    }
+
+    dependencies {
+        compileOnly "io.papermc.paper:paper-api:${rootProject.ext.paperApiVersion}"
+
+        compileOnly "org.projectlombok:lombok:${rootProject.ext.lombokVersion}"
+        annotationProcessor "org.projectlombok:lombok:${rootProject.ext.lombokVersion}"
+        testCompileOnly "org.projectlombok:lombok:${rootProject.ext.lombokVersion}"
+        testAnnotationProcessor "org.projectlombok:lombok:${rootProject.ext.lombokVersion}"
+
+        testImplementation platform('org.junit:junit-bom:5.13.1')
+        testImplementation 'org.junit.jupiter:junit-jupiter'
+        testRuntimeOnly 'org.junit.platform:junit-platform-launcher'
+        testImplementation 'org.mockito:mockito-core:5.20.0'
+        testImplementation 'org.mockito:mockito-junit-jupiter:5.20.0'
+        testImplementation 'org.hamcrest:hamcrest:3.0'
+    }
+}
+
+project(':api') {
+    dependencies {
+        compileOnly 'me.clip:placeholderapi:2.12.2'
+    }
+}
+
+project(':common') {
+    dependencies {
+        api project(':api')
+        compileOnly 'com.googlecode.json-simple:json-simple:1.1.1'
+        testImplementation 'com.googlecode.json-simple:json-simple:1.1.1'
+    }
+}
+
+project(':utils') {
+    dependencies {
+        testImplementation 'org.testng:testng:7.11.0'
+    }
+}
+
+project(':bukkit') {
+    apply plugin: 'com.gradleup.shadow'
+
+    dependencies {
+        implementation project(':api')
+        implementation project(':common')
+        implementation project(':utils')
+
+        implementation 'co.aikar:acf-core:0.5.1-SNAPSHOT'
+        implementation 'co.aikar:acf-bukkit:0.5.1-SNAPSHOT'
+        implementation 'co.aikar:locales:1.0-SNAPSHOT'
+        implementation 'org.bstats:bstats-bukkit:3.1.0'
+        implementation 'com.elmakers.mine.bukkit:EffectLib:10.3'
+        implementation 'commons-lang:commons-lang:2.6'
+        implementation "com.google.dagger:dagger:${rootProject.ext.daggerVersion}"
+        implementation 'javax.inject:javax.inject:1'
+        implementation "org.mapstruct:mapstruct:${rootProject.ext.mapstructVersion}"
+        implementation 'de.tr7zw:item-nbt-api:2.15.7'
+
+        annotationProcessor "org.mapstruct:mapstruct-processor:${rootProject.ext.mapstructVersion}"
+        annotationProcessor 'org.projectlombok:lombok-mapstruct-binding:0.2.0'
+        annotationProcessor "com.google.dagger:dagger-compiler:${rootProject.ext.daggerVersion}"
+
+        compileOnly('me.clip:placeholderapi:2.12.2') {
+            transitive = false
+        }
+        compileOnly('net.milkbowl.vault:VaultAPI:1.7') {
+            transitive = false
+        }
+        compileOnly('com.gmail.filoghost.holographicdisplays:holographicdisplays-api:2.4.0') {
+            transitive = false
+        }
+        compileOnly("com.github.decentsoftware-eu.decentholograms:decentholograms:${rootProject.ext.decentHologramsVersion}") {
+            transitive = false
+        }
+        compileOnly 'com.mojang:authlib:7.0.63'
+        compileOnly('com.github.Zrips:CMI-API:9.7.14.3') {
+            transitive = false
+        }
+        compileOnly('com.github.Zrips:CMILib:1.5.8.1') {
+            transitive = false
+        }
+        if (includeLocalPluginJars.get()) {
+            compileOnly localPluginJars('CMI*.jar')
+        }
+        compileOnly 'com.googlecode.json-simple:json-simple:1.1.1'
+
+        testImplementation 'com.github.seeseemelk:MockBukkit-v1.19:2.29.0'
+    }
+
+    tasks.named('processResources') {
+        filteringCharset = 'UTF-8'
+        filesMatching('plugin.yml') {
+            expand(project: [version: project.version.toString()])
+        }
+    }
+
+    tasks.named('shadowJar') {
+        archiveBaseName.set('CrateReloaded')
+        archiveClassifier.set('')
+        archiveVersion.set(project.version.toString())
+
+        relocate 'co.aikar.commands', 'com.hazebyte.libs.aikar.acf'
+        relocate 'co.aikar.locales', 'com.hazebyte.libs.aikar.locales'
+        relocate 'org.bstats', 'com.hazebyte.bstats'
+        relocate 'dagger', 'com.hazebyte.libs.dagger'
+        relocate 'javax.inject', 'com.hazebyte.libs.javax.inject'
+        relocate 'org.mapstruct', 'com.hazebyte.libs.org.mapstruct'
+        relocate 'de.tr7zw.changeme.nbtapi', 'com.hazebyte.libs.de.tr7zw'
+        relocate 'org.apache.commons.lang', 'com.hazebyte.libs.apache.commons.lang'
+    }
+
+    tasks.named('assemble') {
+        dependsOn tasks.named('shadowJar')
+    }
+}
+
+tasks.register('pluginJar') {
+    group = 'build'
+    description = 'Builds the shaded CrateReloaded plugin jar for Paper 26.1.2.'
+    dependsOn ':bukkit:shadowJar'
+}

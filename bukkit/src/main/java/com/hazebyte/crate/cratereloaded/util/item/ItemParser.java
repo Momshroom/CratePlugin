@@ -224,7 +224,7 @@ public class ItemParser {
         }
 
         if (split[0].equalsIgnoreCase("type")) {
-            potionType = PotionType.valueOf(split[1].toUpperCase());
+            potionType = PotionUtil.getByName(split[1]);
         } else if (split[0].equalsIgnoreCase("effect")) {
             potionEffectType = Potions.getByName(split[1]);
         } else if (split[0].equalsIgnoreCase("power")) {

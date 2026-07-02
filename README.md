@@ -23,15 +23,10 @@ A powerful and flexible crate plugin for Minecraft servers. Create customizable 
 
 ### Prerequisites
 
-We recommend using [Jabba](https://github.com/shyiko/jabba) as a Java version manager:
+Use Java 25 or newer. The Gradle build targets Paper API `26.1.2.build.60-stable`, matching Paper `26.1.2-60`.
 
 ```bash
-# Install Java 17
-jabba install openjdk@1.17
-jabba use
-
-# Verify Java version
-java -version  # Should show Java 17
+java -version  # Should show Java 25+
 ```
 
 ### Building from Source
@@ -47,6 +42,25 @@ java -version  # Should show Java 17
    ./scripts/init-project.sh
    ```
 
+3. **Build the plugin with Gradle:**
+   ```bash
+   ./gradlew clean pluginJar
+   ```
+
+4. **Find the built JAR:**
+   - Gradle: `bukkit/build/libs/CrateReloaded-2.3.16.jar`
+
+The build uses public API artifacts for Paper, PlaceholderAPI, Vault, CMI/CMILib, HolographicDisplays, and DecentHolograms. Local compile-only plugin jars may be placed in `libs/` or under `servers/**/plugins/`; those folders are ignored by git.
+
+### Legacy Maven Build
+
+The original Maven files are still present for reference, but the maintained build path for this fork is Gradle.
+
+```bash
+./gradlew clean pluginJar
+```
+
+<!--
 3. **Build the plugin:**
    ```bash
    # Development build (no obfuscation)
@@ -62,19 +76,12 @@ java -version  # Should show Java 17
 4. **Find the built JAR:**
    - Development: `bukkit/target/CrateReloaded-{version}.jar`
    - Production: `bin/CrateReloaded-{version}.jar` (after ProGuard)
+-->
 
 ### Running Tests
 
 ```bash
-# Run all tests
-mvn test
-
-# Generate coverage report
-mvn test jacoco:report
-
-# Generate full site with reports
-mvn site
-# View in browser: target/site/index.html
+./gradlew test
 ```
 
 ### Code Quality

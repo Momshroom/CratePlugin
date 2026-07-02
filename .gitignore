@@ -1,16 +1,33 @@
 # IDE
 *.iml
-.idea
-.run
+.idea/
+.run/
+.vscode/
 
 # Project Files
 dependency-reduced-pom.xml
+.env
+.env.*
+!.env.example
 
 # Proguard
 mapping.txt
 
 # Build Files
 target/
+*/target/
+build/
+*/build/
+.gradle/
+.m2/
+out/
+libs/*.jar
+!libs/README.md
 
 # Mac
 .DS_Store
+
+# Local test servers and runtime output
+servers/
+logs/
+*.log

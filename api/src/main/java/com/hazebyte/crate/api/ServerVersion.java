@@ -4,14 +4,15 @@ import org.bukkit.Bukkit;
 
 import java.util.HashMap;
 import java.util.Map;
+import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 public class ServerVersion implements Comparable<ServerVersion> {
 
     private static final Map<String, ServerVersion> versions = new HashMap<>();
 
-    private static final Pattern numberPattern = Pattern.compile("[0-9]+.[0-9]+.[0-9]+");
-    private static final Pattern altNumberPattern = Pattern.compile("[0-9]+.[0-9]+");
+    private static final Pattern VERSION_PATTERN =
+            Pattern.compile("^(\\d+)\\.(\\d+)(?:\\.(\\d+))?(?:\\.build\\.\\d+)?$");
 
     public static ServerVersion v1_8_R1 = new ServerVersion(1, 8, 1);
     public static ServerVersion v1_8_R2 = new ServerVersion(1, 8, 2);
@@ -54,21 +55,17 @@ public class ServerVersion implements Comparable<ServerVersion> {
             return ServerVersion.SERVER_MOCK;
         }
 
-        if (!altNumberPattern.matcher(versionString).matches() &&
-            !numberPattern.matcher(versionString).matches())
+        Matcher matcher = VERSION_PATTERN.matcher(versionString);
+        if (!matcher.matches()) {
             throw new IllegalArgumentException(String.format("Unable to parse server version: [%s]", versionString));
+        }
 
         if (versions.containsKey(versionString))
             return versions.get(versionString);
 
-        String[] parts = versionString.split("\\.");
-
-        int major = Integer.parseInt(parts[0]);
-        int minor = Integer.parseInt(parts[1]);
-        int revision = 0;
-        if (parts.length > 2) {
-            revision = Integer.parseInt(parts[2]);
-        }
+        int major = Integer.parseInt(matcher.group(1));
+        int minor = Integer.parseInt(matcher.group(2));
+        int revision = matcher.group(3) == null ? 0 : Integer.parseInt(matcher.group(3));
 
         ServerVersion version = new ServerVersion(major, minor, revision);
         versions.put(versionString, version);

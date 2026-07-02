@@ -1,0 +1,14 @@
+pluginManagement {
+    repositories {
+        gradlePluginPortal()
+        mavenCentral()
+    }
+}
+
+rootProject.name = 'Crates26'
+
+include 'api'
+include 'nms'
+include 'common'
+include 'utils'
+include 'bukkit'

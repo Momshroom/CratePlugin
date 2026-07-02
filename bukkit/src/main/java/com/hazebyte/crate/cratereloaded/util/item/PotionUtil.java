@@ -1,6 +1,7 @@
 package com.hazebyte.crate.cratereloaded.util.item;
 
 import java.util.Collection;
+import java.util.Locale;
 import org.apache.commons.lang.Validate;
 import org.bukkit.Material;
 import org.bukkit.entity.LivingEntity;
@@ -283,10 +284,10 @@ public class PotionUtil {
         PotionType type;
         switch (damage & POTION_BIT) {
             case 1:
-                type = PotionType.REGEN;
+                type = PotionType.REGENERATION;
                 break;
             case 2:
-                type = PotionType.SPEED;
+                type = PotionType.SWIFTNESS;
                 break;
             case 3:
                 type = PotionType.FIRE_RESISTANCE;
@@ -295,7 +296,7 @@ public class PotionUtil {
                 type = PotionType.POISON;
                 break;
             case 5:
-                type = PotionType.INSTANT_HEAL;
+                type = PotionType.HEALING;
                 break;
             case 6:
                 type = PotionType.NIGHT_VISION;
@@ -310,10 +311,10 @@ public class PotionUtil {
                 type = PotionType.SLOWNESS;
                 break;
             case 11:
-                type = PotionType.JUMP;
+                type = PotionType.LEAPING;
                 break;
             case 12:
-                type = PotionType.INSTANT_DAMAGE;
+                type = PotionType.HARMING;
                 break;
             case 13:
                 type = PotionType.WATER_BREATHING;
@@ -349,6 +350,24 @@ public class PotionUtil {
                 && !item.getType().name().contains("TIPPED"))
             throw new IllegalArgumentException("item is not a potion");
         return fromDamage(item.getDurability());
+    }
+
+    public static PotionType getByName(String name) {
+        String normalized = name.toUpperCase(Locale.ROOT);
+        switch (normalized) {
+            case "REGEN":
+                return PotionType.REGENERATION;
+            case "SPEED":
+                return PotionType.SWIFTNESS;
+            case "INSTANT_HEAL":
+                return PotionType.HEALING;
+            case "JUMP":
+                return PotionType.LEAPING;
+            case "INSTANT_DAMAGE":
+                return PotionType.HARMING;
+            default:
+                return PotionType.valueOf(normalized);
+        }
     }
 
     /**

@@ -33,6 +33,15 @@ public class ServerVersionTest {
         }
 
         @Test
+        public void successfullyParsesPaperBuildVersion() {
+            ServerVersion version = ServerVersion.of("26.1.2.build.60");
+            assertNotNull(version);
+            assertEquals(26, version.getMajor());
+            assertEquals(1, version.getMinor());
+            assertEquals(2, version.getRevision());
+        }
+
+        @Test
         public void throwsErrorOnIllegalNumberPattern() {
             assertThrows(IllegalArgumentException.class, () -> ServerVersion.of("1.2.3.4"));
         }
